@@ -100,6 +100,4 @@ curl -X PUT http://localhost:8080/students/1 \
 curl -X DELETE http://localhost:8080/students/1
 ```
 
-## Compilation Verified
 
-✅ `mvn compile` — **BUILD SUCCESS** (all 9 source files compiled)
