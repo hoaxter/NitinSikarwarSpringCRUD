@@ -1,6 +1,4 @@
-Here is your fully structured **README.md in pure Markdown format** (clean, ready to copy-paste):
 
-```markdown
 #  Student Information Portal
 
 A full-stack **Spring Boot** application for managing student records using **JDBC** and **PostgreSQL**. The system supports complete CRUD operations through REST APIs along with a simple frontend interface.
