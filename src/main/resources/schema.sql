@@ -1,7 +1,7 @@
--- Initialize student table if it does not already exist
-CREATE TABLE IF NOT EXISTS students (
-    id      SERIAL       PRIMARY KEY,
-    name    VARCHAR(100) NOT NULL,
-    email   VARCHAR(100) NOT NULL,
-    course  VARCHAR(100) NOT NULL
+-- Enrollee table — created on first launch if absent
+CREATE TABLE IF NOT EXISTS enrollees (
+    enrollee_id   SERIAL        PRIMARY KEY,
+    full_name     VARCHAR(120)  NOT NULL,
+    email_address VARCHAR(120)  NOT NULL,
+    program       VARCHAR(120)  NOT NULL
 );

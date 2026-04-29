@@ -3,147 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Information Portal</title>
-    <meta name="description" content="Manage student records — add, view, update, and delete entries through an intuitive dashboard.">
+    <title>EnrollHub — Dashboard</title>
+    <meta name="description" content="Manage enrollment records through an interactive dashboard built by Nitin.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-    <div class="shell">
+    <!-- ambient background glow -->
+    <div class="ambient-orb ambient-orb--teal"></div>
+    <div class="ambient-orb ambient-orb--indigo"></div>
 
-        <!-- Top bar -->
-        <nav class="topbar">
-            <div class="brand">
-                <div class="brand-badge">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                    </svg>
-                </div>
-                <span class="brand-text">Student Portal</span>
-            </div>
-            <button class="action-btn action-btn--filled" id="btnNew" onclick="showForm()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                New Student
-            </button>
-        </nav>
+    <div class="layout">
 
-        <!-- Summary cards -->
-        <section class="summary-row">
-            <div class="summary-card">
-                <div class="summary-icon summary-icon--blue">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <!-- ─── sidebar ─── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar__logo">
+                <div class="logo-mark">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </div>
-                <div class="summary-data">
-                    <span class="summary-number" id="metricTotal">0</span>
-                    <span class="summary-label">Total Students</span>
-                </div>
+                <span class="logo-label">EnrollHub</span>
             </div>
-            <div class="summary-card">
-                <div class="summary-icon summary-icon--purple">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                </div>
-                <div class="summary-data">
-                    <span class="summary-number" id="metricCourses">0</span>
-                    <span class="summary-label">Courses</span>
-                </div>
+            <nav class="sidebar__nav">
+                <a href="#" class="nav-link nav-link--active" id="navDashboard">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Dashboard
+                </a>
+            </nav>
+            <div class="sidebar__footer">
+                <span class="sidebar__credit">Built by Nitin</span>
             </div>
-            <div class="summary-card">
-                <div class="summary-icon summary-icon--green">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                </div>
-                <div class="summary-data">
-                    <span class="summary-number summary-live" id="metricStatus">Active</span>
-                    <span class="summary-label">Server</span>
-                </div>
-            </div>
-        </section>
+        </aside>
 
-        <!-- Search -->
-        <div class="search-bar">
-            <svg class="search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="filterInput" class="search-input" placeholder="Search students..." oninput="applyFilter()">
-        </div>
+        <!-- ─── main content ─── -->
+        <main class="content">
 
-        <!-- Data table -->
-        <section class="panel">
-            <div class="panel-top">
-                <h2 class="panel-title">All Students</h2>
-                <span class="pill" id="rowBadge">0</span>
+            <!-- header row -->
+            <header class="content__header">
+                <div>
+                    <h1 class="page-heading">Enrollment Dashboard</h1>
+                    <p class="page-sub">Track and manage all enrollee records in one place.</p>
+                </div>
+                <button class="cta-solid" id="btnAddNew" onclick="NitinApp.openPanel()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Add Enrollee
+                </button>
+            </header>
+
+            <!-- metric tiles -->
+            <section class="metrics-row">
+                <div class="metric-tile">
+                    <div class="metric-icon metric-icon--cyan">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div class="metric-body">
+                        <span class="metric-val" id="kpiTotal">0</span>
+                        <span class="metric-tag">Enrollees</span>
+                    </div>
+                </div>
+                <div class="metric-tile">
+                    <div class="metric-icon metric-icon--violet">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    </div>
+                    <div class="metric-body">
+                        <span class="metric-val" id="kpiPrograms">0</span>
+                        <span class="metric-tag">Programs</span>
+                    </div>
+                </div>
+                <div class="metric-tile">
+                    <div class="metric-icon metric-icon--emerald">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div class="metric-body">
+                        <span class="metric-val metric-val--live" id="kpiHealth">Online</span>
+                        <span class="metric-tag">API</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- search -->
+            <div class="filter-strip">
+                <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="filter-input" id="searchField" placeholder="Filter by name, email or program…" oninput="NitinApp.onFilter()">
             </div>
-            <div class="table-wrap" id="gridWrap">
-                <table class="data-table" id="dataGrid">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Course</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="gridBody"></tbody>
-                </table>
-            </div>
-            <div class="empty-box" id="placeholder" style="display:none">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <p class="empty-heading">No students yet</p>
-                <p class="empty-hint">Click <strong>New Student</strong> to add the first entry.</p>
-            </div>
-        </section>
+
+            <!-- enrollee grid -->
+            <section class="grid-section">
+                <div class="grid-header">
+                    <h2 class="grid-title">All Enrollees</h2>
+                    <span class="badge" id="countBadge">0</span>
+                </div>
+                <div class="grid-container" id="gridContainer"></div>
+                <div class="blank-state" id="blankState">
+                    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <p class="blank-title">No enrollees yet</p>
+                    <p class="blank-hint">Click <strong>Add Enrollee</strong> to create the first record.</p>
+                </div>
+            </section>
+
+        </main>
     </div>
 
-    <!-- Form drawer -->
-    <div class="overlay" id="overlay" onclick="hideForm(event)">
-        <div class="drawer" onclick="event.stopPropagation()">
-            <div class="drawer-head">
-                <h3 id="drawerTitle">New Student</h3>
-                <button class="close-btn" id="btnCloseDrawer" onclick="hideForm()">
+    <!-- ─── slide-in panel (create / edit) ─── -->
+    <div class="backdrop" id="panelBackdrop" onclick="NitinApp.closePanel(event)">
+        <div class="slide-panel" onclick="event.stopPropagation()">
+            <div class="slide-panel__head">
+                <h3 id="panelHeading">New Enrollee</h3>
+                <button class="icon-btn" id="btnClosePanel" onclick="NitinApp.closePanel()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
-            <form id="entryForm" onsubmit="submitEntry(event)">
-                <input type="hidden" id="entryId">
-                <label class="lbl" for="entryName">Name</label>
-                <input class="inp" type="text" id="entryName" placeholder="e.g. Pagati Sharma" required>
+            <form id="enrollForm" onsubmit="NitinApp.handleSave(event)">
+                <input type="hidden" id="hiddenId">
 
-                <label class="lbl" for="entryEmail">Email</label>
-                <input class="inp" type="email" id="entryEmail" placeholder="e.g. pagati@college.com" required>
+                <label class="field-label" for="fieldName">Full Name</label>
+                <input class="field-input" type="text" id="fieldName" placeholder="e.g. Nitin Sikarwar" required>
 
-                <label class="lbl" for="entryCourse">Course</label>
-                <input class="inp" type="text" id="entryCourse" placeholder="e.g. Computer Science" required>
+                <label class="field-label" for="fieldEmail">Email Address</label>
+                <input class="field-input" type="email" id="fieldEmail" placeholder="e.g. nitin@university.in" required>
 
-                <div class="drawer-footer">
-                    <button type="button" class="action-btn action-btn--outline" id="btnFormCancel" onclick="hideForm()">Cancel</button>
-                    <button type="submit" class="action-btn action-btn--filled" id="btnFormSave"><span id="saveBtnLabel">Save</span></button>
+                <label class="field-label" for="fieldProgram">Program</label>
+                <input class="field-input" type="text" id="fieldProgram" placeholder="e.g. Computer Science" required>
+
+                <div class="panel-actions">
+                    <button type="button" class="cta-ghost" id="btnCancelForm" onclick="NitinApp.closePanel()">Discard</button>
+                    <button type="submit" class="cta-solid" id="btnSaveForm"><span id="saveLabel">Create</span></button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Delete confirm -->
-    <div class="overlay" id="confirmOverlay" onclick="hideConfirm(event)">
-        <div class="drawer drawer--sm" onclick="event.stopPropagation()">
-            <div class="confirm-body">
-                <div class="confirm-badge">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    <!-- ─── delete confirmation ─── -->
+    <div class="backdrop" id="removeBackdrop" onclick="NitinApp.closeRemoveDialog(event)">
+        <div class="dialog-box" onclick="event.stopPropagation()">
+            <div class="dialog-visual">
+                <div class="dialog-ring">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </div>
-                <h3>Delete Student?</h3>
-                <p id="confirmName"></p>
-                <p class="confirm-sub">This action is permanent.</p>
+                <h3>Remove Enrollee?</h3>
+                <p id="removeName"></p>
+                <p class="dialog-muted">This cannot be reversed.</p>
             </div>
-            <div class="drawer-footer">
-                <button class="action-btn action-btn--outline" id="btnConfirmCancel" onclick="hideConfirm()">Cancel</button>
-                <button class="action-btn action-btn--danger" id="btnConfirmYes" onclick="performDelete()">Delete</button>
+            <div class="panel-actions">
+                <button class="cta-ghost" id="btnCancelRemove" onclick="NitinApp.closeRemoveDialog()">Keep</button>
+                <button class="cta-danger" id="btnConfirmRemove" onclick="NitinApp.confirmRemove()">Remove</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast area -->
-    <div id="toastArea" class="toast-area"></div>
+    <!-- ─── notification tray ─── -->
+    <div id="notifTray" class="notif-tray"></div>
 
     <script src="/js/app.js"></script>
 </body>
