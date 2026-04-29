@@ -1,12 +1,12 @@
-package com.example.studentcrud;
+package com.pagati.studentapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class StudentCrudApplication {
+public class StudentAppApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(StudentCrudApplication.class, args);
+        SpringApplication.run(StudentAppApplication.class, args);
     }
 }

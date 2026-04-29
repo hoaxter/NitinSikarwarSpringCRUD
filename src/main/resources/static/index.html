@@ -3,90 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Management System</title>
-    <meta name="description" content="A modern student management system with full CRUD operations built with Spring Boot and JDBC.">
+    <title>Student Information Portal</title>
+    <meta name="description" content="Manage student records — add, view, update, and delete entries through an intuitive dashboard.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <!-- Animated background -->
-    <div class="bg-gradient"></div>
-    <div class="bg-grid"></div>
 
-    <div class="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="logo-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                            <path d="M6 12v5c3 3 6 3 12 0v-5"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h1>Student Manager</h1>
-                        <p class="header-subtitle">Spring Boot JDBC CRUD Application</p>
-                    </div>
-                </div>
-                <button class="btn btn-primary" id="btnAddStudent" onclick="openModal()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    <div class="shell">
+
+        <!-- Top bar -->
+        <nav class="topbar">
+            <div class="brand">
+                <div class="brand-badge">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                     </svg>
-                    Add Student
-                </button>
+                </div>
+                <span class="brand-text">Student Portal</span>
             </div>
-        </header>
+            <button class="action-btn action-btn--filled" id="btnNew" onclick="showForm()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Student
+            </button>
+        </nav>
 
-        <!-- Stats Bar -->
-        <div class="stats-bar">
-            <div class="stat-card">
-                <div class="stat-icon stat-icon-total">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <!-- Summary cards -->
+        <section class="summary-row">
+            <div class="summary-card">
+                <div class="summary-icon summary-icon--blue">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
-                <div>
-                    <span class="stat-value" id="totalStudents">0</span>
-                    <span class="stat-label">Total Students</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon stat-icon-courses">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                </div>
-                <div>
-                    <span class="stat-value" id="totalCourses">0</span>
-                    <span class="stat-label">Courses</span>
+                <div class="summary-data">
+                    <span class="summary-number" id="metricTotal">0</span>
+                    <span class="summary-label">Total Students</span>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon stat-icon-api">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <div class="summary-card">
+                <div class="summary-icon summary-icon--purple">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                 </div>
-                <div>
-                    <span class="stat-value stat-online" id="apiStatus">Online</span>
-                    <span class="stat-label">API Status</span>
+                <div class="summary-data">
+                    <span class="summary-number" id="metricCourses">0</span>
+                    <span class="summary-label">Courses</span>
                 </div>
             </div>
+            <div class="summary-card">
+                <div class="summary-icon summary-icon--green">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div class="summary-data">
+                    <span class="summary-number summary-live" id="metricStatus">Active</span>
+                    <span class="summary-label">Server</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search -->
+        <div class="search-bar">
+            <svg class="search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="filterInput" class="search-input" placeholder="Search students..." oninput="applyFilter()">
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-section">
-            <div class="search-box">
-                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="searchInput" placeholder="Search by name, email, or course..." oninput="filterStudents()">
+        <!-- Data table -->
+        <section class="panel">
+            <div class="panel-top">
+                <h2 class="panel-title">All Students</h2>
+                <span class="pill" id="rowBadge">0</span>
             </div>
-        </div>
-
-        <!-- Student Table -->
-        <div class="table-container">
-            <div class="table-header">
-                <h2>Student Records</h2>
-                <span class="record-count" id="recordCount">0 records</span>
-            </div>
-            <div class="table-wrapper">
-                <table id="studentTable">
+            <div class="table-wrap" id="gridWrap">
+                <table class="data-table" id="dataGrid">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -96,80 +85,65 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="studentTableBody">
-                        <!-- Rows populated by JS -->
-                    </tbody>
+                    <tbody id="gridBody"></tbody>
                 </table>
             </div>
-            <!-- Empty state -->
-            <div class="empty-state" id="emptyState" style="display: none;">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-                <h3>No students found</h3>
-                <p>Add your first student to get started</p>
+            <div class="empty-box" id="placeholder" style="display:none">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <p class="empty-heading">No students yet</p>
+                <p class="empty-hint">Click <strong>New Student</strong> to add the first entry.</p>
             </div>
-        </div>
+        </section>
     </div>
 
-    <!-- Modal Overlay -->
-    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-        <div class="modal" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h2 id="modalTitle">Add New Student</h2>
-                <button class="modal-close" id="btnCloseModal" onclick="closeModal()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <!-- Form drawer -->
+    <div class="overlay" id="overlay" onclick="hideForm(event)">
+        <div class="drawer" onclick="event.stopPropagation()">
+            <div class="drawer-head">
+                <h3 id="drawerTitle">New Student</h3>
+                <button class="close-btn" id="btnCloseDrawer" onclick="hideForm()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
-            <form id="studentForm" onsubmit="handleSubmit(event)">
-                <input type="hidden" id="studentId">
-                <div class="form-group">
-                    <label for="studentName">Full Name</label>
-                    <input type="text" id="studentName" placeholder="e.g. Nitin Sikarwar" required>
-                </div>
-                <div class="form-group">
-                    <label for="studentEmail">Email Address</label>
-                    <input type="email" id="studentEmail" placeholder="e.g. nitin@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="studentCourse">Course</label>
-                    <input type="text" id="studentCourse" placeholder="e.g. Computer Science" required>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-ghost" id="btnCancel" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="btnSubmit">
-                        <span id="submitBtnText">Add Student</span>
-                    </button>
+            <form id="entryForm" onsubmit="submitEntry(event)">
+                <input type="hidden" id="entryId">
+                <label class="lbl" for="entryName">Name</label>
+                <input class="inp" type="text" id="entryName" placeholder="e.g. Pagati Sharma" required>
+
+                <label class="lbl" for="entryEmail">Email</label>
+                <input class="inp" type="email" id="entryEmail" placeholder="e.g. pagati@college.com" required>
+
+                <label class="lbl" for="entryCourse">Course</label>
+                <input class="inp" type="text" id="entryCourse" placeholder="e.g. Computer Science" required>
+
+                <div class="drawer-footer">
+                    <button type="button" class="action-btn action-btn--outline" id="btnFormCancel" onclick="hideForm()">Cancel</button>
+                    <button type="submit" class="action-btn action-btn--filled" id="btnFormSave"><span id="saveBtnLabel">Save</span></button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal-overlay" id="deleteModalOverlay" onclick="closeDeleteModal(event)">
-        <div class="modal modal-sm" onclick="event.stopPropagation()">
-            <div class="modal-header modal-header-danger">
-                <h2>Confirm Deletion</h2>
-                <button class="modal-close" id="btnCloseDeleteModal" onclick="closeDeleteModal()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-            </div>
-            <div class="delete-body">
-                <div class="delete-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+    <!-- Delete confirm -->
+    <div class="overlay" id="confirmOverlay" onclick="hideConfirm(event)">
+        <div class="drawer drawer--sm" onclick="event.stopPropagation()">
+            <div class="confirm-body">
+                <div class="confirm-badge">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </div>
-                <p>Are you sure you want to delete <strong id="deleteStudentName"></strong>?</p>
-                <p class="text-muted">This action cannot be undone.</p>
+                <h3>Delete Student?</h3>
+                <p id="confirmName"></p>
+                <p class="confirm-sub">This action is permanent.</p>
             </div>
-            <div class="form-actions">
-                <button class="btn btn-ghost" id="btnCancelDelete" onclick="closeDeleteModal()">Cancel</button>
-                <button class="btn btn-danger" id="btnConfirmDelete" onclick="confirmDelete()">Delete Student</button>
+            <div class="drawer-footer">
+                <button class="action-btn action-btn--outline" id="btnConfirmCancel" onclick="hideConfirm()">Cancel</button>
+                <button class="action-btn action-btn--danger" id="btnConfirmYes" onclick="performDelete()">Delete</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
+    <!-- Toast area -->
+    <div id="toastArea" class="toast-area"></div>
 
     <script src="/js/app.js"></script>
 </body>

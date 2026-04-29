@@ -1,288 +1,234 @@
-/* =============================================
-   Student Manager — Frontend Logic
-   ============================================= */
+/*
+ * Student Portal — Client-side Logic
+ */
 
-const API_BASE = '/students';
+var ENDPOINT = '/students';
 
-let allStudents = [];
-let deleteTargetId = null;
+var records  = [];
+var deleteId = null;
 
-// ─── Init ────────────────────────────────────
+// Bootstrap
+window.addEventListener('load', loadRecords);
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetchStudents();
-});
+// ──── Data fetching ──────────────────────────
 
-// ─── CRUD Operations ─────────────────────────
-
-async function fetchStudents() {
-    showLoadingSkeleton();
+async function loadRecords() {
     try {
-        const res = await fetch(API_BASE);
-        if (!res.ok) throw new Error('Failed to fetch students');
-        allStudents = await res.json();
-        renderStudents(allStudents);
-        updateStats(allStudents);
-        setApiStatus(true);
-    } catch (err) {
-        console.error(err);
-        setApiStatus(false);
-        showToast('Failed to load students. Is the server running?', 'error');
-        renderStudents([]);
-        updateStats([]);
+        var resp = await fetch(ENDPOINT);
+        if (!resp.ok) throw new Error(resp.statusText);
+        records = await resp.json();
+        paint(records);
+        refreshMetrics(records);
+        markServer(true);
+    } catch (e) {
+        console.error('Load failed:', e);
+        markServer(false);
+        notify('Could not reach the server.', false);
+        paint([]);
+        refreshMetrics([]);
     }
 }
 
-async function createStudent(data) {
+async function saveRecord(payload) {
     try {
-        const res = await fetch(API_BASE, {
+        var resp = await fetch(ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('Failed to create student');
-        const student = await res.json();
-        showToast(`${student.name} added successfully!`, 'success');
-        fetchStudents();
+        if (!resp.ok) throw new Error(resp.statusText);
+        var result = await resp.json();
+        notify(result.name + ' has been added.');
+        loadRecords();
         return true;
-    } catch (err) {
-        console.error(err);
-        showToast('Failed to create student.', 'error');
+    } catch (e) {
+        console.error('Save failed:', e);
+        notify('Could not save the record.', false);
         return false;
     }
 }
 
-async function updateStudent(id, data) {
+async function patchRecord(id, payload) {
     try {
-        const res = await fetch(`${API_BASE}/${id}`, {
+        var resp = await fetch(ENDPOINT + '/' + id, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('Failed to update student');
-        const student = await res.json();
-        showToast(`${student.name} updated successfully!`, 'success');
-        fetchStudents();
+        if (!resp.ok) throw new Error(resp.statusText);
+        var result = await resp.json();
+        notify(result.name + ' has been updated.');
+        loadRecords();
         return true;
-    } catch (err) {
-        console.error(err);
-        showToast('Failed to update student.', 'error');
+    } catch (e) {
+        console.error('Patch failed:', e);
+        notify('Could not update the record.', false);
         return false;
     }
 }
 
-async function deleteStudent(id) {
+async function destroyRecord(id) {
     try {
-        const res = await fetch(`${API_BASE}/${id}`, {
-            method: 'DELETE'
-        });
-        if (!res.ok) throw new Error('Failed to delete student');
-        showToast('Student deleted successfully.', 'success');
-        fetchStudents();
-        return true;
-    } catch (err) {
-        console.error(err);
-        showToast('Failed to delete student.', 'error');
-        return false;
+        var resp = await fetch(ENDPOINT + '/' + id, { method: 'DELETE' });
+        if (!resp.ok) throw new Error(resp.statusText);
+        notify('Record removed successfully.');
+        loadRecords();
+    } catch (e) {
+        console.error('Delete failed:', e);
+        notify('Could not remove the record.', false);
     }
 }
 
-// ─── Rendering ───────────────────────────────
+// ──── Rendering ──────────────────────────────
 
-function renderStudents(students) {
-    const tbody = document.getElementById('studentTableBody');
-    const emptyState = document.getElementById('emptyState');
-    const tableWrapper = document.querySelector('.table-wrapper');
-    const countEl = document.getElementById('recordCount');
+function paint(list) {
+    var body        = document.getElementById('gridBody');
+    var placeholder = document.getElementById('placeholder');
+    var wrap        = document.getElementById('gridWrap');
+    var badge       = document.getElementById('rowBadge');
 
-    if (students.length === 0) {
-        tbody.innerHTML = '';
-        tableWrapper.style.display = 'none';
-        emptyState.style.display = 'block';
-        countEl.textContent = '0 records';
+    badge.textContent = list.length;
+
+    if (list.length === 0) {
+        body.innerHTML = '';
+        wrap.style.display = 'none';
+        placeholder.style.display = 'block';
         return;
     }
 
-    tableWrapper.style.display = 'block';
-    emptyState.style.display = 'none';
-    countEl.textContent = `${students.length} record${students.length !== 1 ? 's' : ''}`;
+    wrap.style.display = 'block';
+    placeholder.style.display = 'none';
 
-    tbody.innerHTML = students.map((s, i) => `
-        <tr style="animation-delay: ${i * 0.04}s">
-            <td>#${s.id}</td>
-            <td><span class="student-name">${escapeHtml(s.name)}</span></td>
-            <td><span class="student-email">${escapeHtml(s.email)}</span></td>
-            <td><span class="course-badge">${escapeHtml(s.course)}</span></td>
-            <td>
-                <div class="actions-cell">
-                    <button class="btn-icon edit" title="Edit" onclick="openEditModal(${s.id})">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    </button>
-                    <button class="btn-icon delete" title="Delete" onclick="openDeleteModal(${s.id}, '${escapeHtml(s.name)}')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    body.innerHTML = list.map(function (s, idx) {
+        return '<tr style="animation-delay:' + (idx * 35) + 'ms">' +
+            '<td>' + s.id + '</td>' +
+            '<td class="name-cell">' + safe(s.name) + '</td>' +
+            '<td class="email-cell">' + safe(s.email) + '</td>' +
+            '<td><span class="course-tag">' + safe(s.course) + '</span></td>' +
+            '<td><div class="opts-cell">' +
+                '<button class="row-btn row-edit" title="Edit" onclick="openEdit(' + s.id + ')">' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>' +
+                '</button>' +
+                '<button class="row-btn row-del" title="Delete" onclick="openConfirm(' + s.id + ',\'' + safe(s.name) + '\')">' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>' +
+                '</button>' +
+            '</div></td>' +
+        '</tr>';
+    }).join('');
 }
 
-function showLoadingSkeleton() {
-    const tbody = document.getElementById('studentTableBody');
-    const rows = Array.from({ length: 4 }, () => `
-        <tr class="skeleton-row">
-            <td><span class="skeleton" style="width:30px">&nbsp;</span></td>
-            <td><span class="skeleton" style="width:120px">&nbsp;</span></td>
-            <td><span class="skeleton" style="width:160px">&nbsp;</span></td>
-            <td><span class="skeleton" style="width:100px">&nbsp;</span></td>
-            <td><span class="skeleton" style="width:70px">&nbsp;</span></td>
-        </tr>
-    `).join('');
-    tbody.innerHTML = rows;
+function refreshMetrics(list) {
+    document.getElementById('metricTotal').textContent = list.length;
+    var unique = {};
+    list.forEach(function (s) { unique[s.course] = true; });
+    document.getElementById('metricCourses').textContent = Object.keys(unique).length;
 }
 
-function updateStats(students) {
-    document.getElementById('totalStudents').textContent = students.length;
-    const courses = new Set(students.map(s => s.course));
-    document.getElementById('totalCourses').textContent = courses.size;
+function markServer(up) {
+    var el = document.getElementById('metricStatus');
+    el.textContent = up ? 'Active' : 'Down';
+    el.style.color = up ? '' : '#ef4444';
+    if (!up) el.classList.remove('summary-live');
+    else     el.classList.add('summary-live');
 }
 
-function setApiStatus(online) {
-    const el = document.getElementById('apiStatus');
-    if (online) {
-        el.textContent = 'Online';
-        el.classList.add('stat-online');
-    } else {
-        el.textContent = 'Offline';
-        el.classList.remove('stat-online');
-        el.style.color = '#ef4444';
-    }
+// ──── Filter ─────────────────────────────────
+
+function applyFilter() {
+    var q = document.getElementById('filterInput').value.toLowerCase();
+    if (!q) { paint(records); return; }
+    var hits = records.filter(function (s) {
+        return s.name.toLowerCase().indexOf(q) > -1 ||
+               s.email.toLowerCase().indexOf(q) > -1 ||
+               s.course.toLowerCase().indexOf(q) > -1;
+    });
+    paint(hits);
 }
 
-// ─── Search / Filter ─────────────────────────
+// ──── Form drawer ────────────────────────────
 
-function filterStudents() {
-    const query = document.getElementById('searchInput').value.toLowerCase().trim();
-    if (!query) {
-        renderStudents(allStudents);
-        return;
-    }
-    const filtered = allStudents.filter(s =>
-        s.name.toLowerCase().includes(query) ||
-        s.email.toLowerCase().includes(query) ||
-        s.course.toLowerCase().includes(query)
-    );
-    renderStudents(filtered);
+function showForm() {
+    document.getElementById('drawerTitle').textContent = 'New Student';
+    document.getElementById('saveBtnLabel').textContent = 'Save';
+    document.getElementById('entryForm').reset();
+    document.getElementById('entryId').value = '';
+    document.getElementById('overlay').classList.add('open');
+    setTimeout(function () { document.getElementById('entryName').focus(); }, 280);
 }
 
-// ─── Add / Edit Modal ────────────────────────
-
-function openModal() {
-    document.getElementById('modalTitle').textContent = 'Add New Student';
-    document.getElementById('submitBtnText').textContent = 'Add Student';
-    document.getElementById('studentForm').reset();
-    document.getElementById('studentId').value = '';
-    document.getElementById('modalOverlay').classList.add('active');
-    setTimeout(() => document.getElementById('studentName').focus(), 300);
+function openEdit(id) {
+    var rec = records.find(function (s) { return s.id === id; });
+    if (!rec) return;
+    document.getElementById('drawerTitle').textContent = 'Edit Student';
+    document.getElementById('saveBtnLabel').textContent = 'Update';
+    document.getElementById('entryId').value    = rec.id;
+    document.getElementById('entryName').value  = rec.name;
+    document.getElementById('entryEmail').value = rec.email;
+    document.getElementById('entryCourse').value = rec.course;
+    document.getElementById('overlay').classList.add('open');
+    setTimeout(function () { document.getElementById('entryName').focus(); }, 280);
 }
 
-function openEditModal(id) {
-    const student = allStudents.find(s => s.id === id);
-    if (!student) return;
-
-    document.getElementById('modalTitle').textContent = 'Edit Student';
-    document.getElementById('submitBtnText').textContent = 'Save Changes';
-    document.getElementById('studentId').value = student.id;
-    document.getElementById('studentName').value = student.name;
-    document.getElementById('studentEmail').value = student.email;
-    document.getElementById('studentCourse').value = student.course;
-    document.getElementById('modalOverlay').classList.add('active');
-    setTimeout(() => document.getElementById('studentName').focus(), 300);
+function hideForm(ev) {
+    if (ev && ev.target !== document.getElementById('overlay')) return;
+    document.getElementById('overlay').classList.remove('open');
 }
 
-function closeModal(event) {
-    if (event && event.target !== document.getElementById('modalOverlay')) return;
-    document.getElementById('modalOverlay').classList.remove('active');
-}
-
-async function handleSubmit(event) {
-    event.preventDefault();
-
-    const id = document.getElementById('studentId').value;
-    const data = {
-        name: document.getElementById('studentName').value.trim(),
-        email: document.getElementById('studentEmail').value.trim(),
-        course: document.getElementById('studentCourse').value.trim()
+async function submitEntry(ev) {
+    ev.preventDefault();
+    var id = document.getElementById('entryId').value;
+    var payload = {
+        name:   document.getElementById('entryName').value.trim(),
+        email:  document.getElementById('entryEmail').value.trim(),
+        course: document.getElementById('entryCourse').value.trim()
     };
-
-    let success;
-    if (id) {
-        success = await updateStudent(id, data);
-    } else {
-        success = await createStudent(data);
-    }
-
-    if (success) {
-        closeModal();
-    }
+    var ok = id ? await patchRecord(id, payload) : await saveRecord(payload);
+    if (ok) hideForm();
 }
 
-// ─── Delete Modal ────────────────────────────
+// ──── Delete confirm ─────────────────────────
 
-function openDeleteModal(id, name) {
-    deleteTargetId = id;
-    document.getElementById('deleteStudentName').textContent = name;
-    document.getElementById('deleteModalOverlay').classList.add('active');
+function openConfirm(id, name) {
+    deleteId = id;
+    document.getElementById('confirmName').textContent = name;
+    document.getElementById('confirmOverlay').classList.add('open');
 }
 
-function closeDeleteModal(event) {
-    if (event && event.target !== document.getElementById('deleteModalOverlay')) return;
-    document.getElementById('deleteModalOverlay').classList.remove('active');
-    deleteTargetId = null;
+function hideConfirm(ev) {
+    if (ev && ev.target !== document.getElementById('confirmOverlay')) return;
+    document.getElementById('confirmOverlay').classList.remove('open');
+    deleteId = null;
 }
 
-async function confirmDelete() {
-    if (deleteTargetId === null) return;
-    await deleteStudent(deleteTargetId);
-    closeDeleteModal();
+async function performDelete() {
+    if (deleteId === null) return;
+    await destroyRecord(deleteId);
+    hideConfirm();
 }
 
-// ─── Toast Notifications ─────────────────────
+// ──── Toast ──────────────────────────────────
 
-function showToast(message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-
-    const iconSvg = type === 'success'
-        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>'
-        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
-
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-        <div class="toast-icon">${iconSvg}</div>
-        <span class="toast-message">${escapeHtml(message)}</span>
-    `;
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add('removing');
-        toast.addEventListener('animationend', () => toast.remove());
-    }, 3000);
+function notify(msg, ok) {
+    if (ok === undefined) ok = true;
+    var area = document.getElementById('toastArea');
+    var el   = document.createElement('div');
+    el.className = 'toast ' + (ok ? 'toast--ok' : 'toast--err');
+    el.textContent = msg;
+    area.appendChild(el);
+    setTimeout(function () {
+        el.classList.add('out');
+        el.addEventListener('animationend', function () { el.remove(); });
+    }, 2800);
 }
 
-// ─── Utilities ───────────────────────────────
+// ──── Helpers ────────────────────────────────
 
-function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+function safe(str) {
+    var node = document.createElement('span');
+    node.textContent = str;
+    return node.innerHTML;
 }
 
-// Close modals on Escape key
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeModal();
-        closeDeleteModal();
-    }
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { hideForm(); hideConfirm(); }
 });
