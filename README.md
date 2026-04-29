@@ -139,8 +139,3 @@ The application follows a layered architecture:
 * Improve UI/UX with modern frontend framework
 
 ---
-
-```
-
-If you want next level GitHub polish (badges, screenshots, GIF demos), say the word.
-```
